@@ -21,7 +21,7 @@ python -m bugfix_agent demo --case coupon --open
 
 ## 真实运行证据
 
-已有一次通过兼容接口完成的 coupon 案例 live 运行：
+已通过兼容接口完成 coupon 和 pagination 两个案例的 live 运行。coupon 首次结果：
 
 | 项目 | 观察结果 |
 |---|---|
@@ -35,7 +35,9 @@ python -m bugfix_agent demo --case coupon --open
 
 查看 [运行记录与限制](docs/真实模型运行记录.md)、[完整 JSON 证据](docs/evidence/coupon-live/report.json) 和 [实际补丁](docs/evidence/coupon-live/patch.diff)。克隆后可用浏览器打开 `docs/evidence/coupon-live/report.html`；GitHub 文件页不会直接执行 HTML。
 
-该历史报告已移除本机绝对路径，其余运行数据保留。**这是单例联调，不能解释为整体成功率。** 默认配置使用官方接口；官方接口尚未实测，实际历史测试来源在运行记录中说明。
+分页案例也在第一轮修复成功：原有 3 项测试通过，模型新增 5 项测试，其中 2 项在原代码上断言失败，修复后共 8 项通过；4 次 API 请求，耗时 39.818 秒。查看 [分页完整证据](docs/evidence/pagination-live/report.json) 和 [补丁](docs/evidence/pagination-live/patch.diff)。
+
+历史报告已移除本机绝对路径，其余运行数据保留。**这是两个简单案例的联调，不能解释为整体成功率。** 默认配置使用官方接口；官方接口尚未实测，实际历史测试来源在运行记录中说明。
 
 ## 接入 DeepSeek 官方 API
 
