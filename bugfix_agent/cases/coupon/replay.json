@@ -1,0 +1,6 @@
+{
+  "locator": {"files": ["pricing.py"], "reason": "payable 是优惠后金额的唯一计算入口。"},
+  "tester": {"test_source": "from pricing import payable\n\ndef test_discount_cannot_make_payable_negative():\n    assert payable(10000, 15000) == 0, '实付金额必须以 0 为下界'\n\ndef test_empty_order_with_coupon():\n    assert payable(0, 500) == 0\n", "reason": "补充超额优惠和零金额订单两个边界，原实现返回负数。"},
+  "fixer": {"edits": [{"path": "pricing.py", "search": "return subtotal_cents - discount_cents", "replace": "return max(0, subtotal_cents - discount_cents)"}], "summary": "为实付金额增加零下界，保留输入校验。"},
+  "reviewer": {"approved": true, "findings": ["预设审查意见：只修改金额计算，不修改测试或输入校验。", "预设审查意见：通用零下界覆盖超额优惠，未对演示输入硬编码。"]}
+}

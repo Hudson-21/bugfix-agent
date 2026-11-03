@@ -1,0 +1,16 @@
+--- a/pricing.py
++++ b/pricing.py
+@@ -5,4 +5,4 @@
+     """优惠后实付金额；业务约定金额不能为负数。"""
+     if subtotal_cents < 0 or discount_cents < 0:
+         raise ValueError("金额和优惠必须非负")
+-    return subtotal_cents - discount_cents
++    return max(0, subtotal_cents - discount_cents)
+--- /dev/null
++++ b/test_agent_regression.py
+@@ -0,0 +1,5 @@
++from pricing import payable
++
++
++def test_discount_exceeding_subtotal_clamped_to_zero():
++    assert payable(10000, 15000) == 0

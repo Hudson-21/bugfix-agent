@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.11', '3.13']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e .
+      - run: python -m pytest -q
+      - run: python -m pip wheel --no-deps . --wheel-dir dist
+      - run: python -m bugfix_agent demo --case coupon --output runs/ci-coupon
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: repair-report-${{ matrix.os }}-${{ matrix.python-version }}
+          path: runs/ci-coupon/

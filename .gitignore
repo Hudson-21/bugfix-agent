@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.egg-info/
+build/
+dist/
+.env
+.env.*
+!.env.example
+runs/
+output/
+.playwright-cli/
+# Local planning and job preparation notes are not distribution artifacts.
+docs/superpowers/
+docs/七天推进安排.md
+docs/面试讲解.md

@@ -1,0 +1,6 @@
+{
+  "locator": {"files": ["pagination.py"], "reason": "page_count 使用整除计算页数，可能丢弃尾页。"},
+  "tester": {"test_source": "from pagination import page_count\n\ndef test_partial_final_page():\n    assert page_count(21, 10) == 3\n\ndef test_single_item():\n    assert page_count(1, 10) == 1\n", "reason": "验证不足整页时必须向上取整。"},
+  "fixer": {"edits": [{"path": "pagination.py", "search": "return total_items // page_size", "replace": "return (total_items + page_size - 1) // page_size"}], "summary": "用整数向上取整公式计算页数。"},
+  "reviewer": {"approved": true, "findings": ["预设审查意见：空数据仍返回 0，整页结果不变。", "预设审查意见：保留参数校验，未引入浮点精度问题。"]}
+}

@@ -1,0 +1,183 @@
+{
+  "id": "20261103-203403-7de7dc",
+  "issue": "pricing.payable 接收以分为单位的整数金额。当订单金额为 10000 分、优惠券为 15000 分时，当前返回 -5000 分。业务要求实付金额最低为 0，优惠券超过订单金额时应该返回 0。保留正常优惠计算、负数输入拒绝等已有行为。",
+  "source": "bugfix_agent/cases/coupon/repo",
+  "output": "docs/evidence/coupon-live",
+  "mode": "live",
+  "model": "deepseek-v4.1-flash",
+  "status": "success",
+  "started_at": "2026-11-03T12:34:03.487510+00:00",
+  "events": [
+    {
+      "stage": "baseline",
+      "status": "passed",
+      "data": {
+        "returncode": 0,
+        "tests": 5,
+        "failed": 0,
+        "assertion_failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "timed_out": false,
+        "duration": 0.726,
+        "log": ".....                                                                    [100%]\n5 passed in 0.23s\n",
+        "passed": true
+      },
+      "duration": 0.736
+    },
+    {
+      "stage": "locator",
+      "status": "passed",
+      "data": {
+        "files": [
+          "pricing.py"
+        ],
+        "reason": "问题集中在 payable 的金额下限逻辑：需在该函数中对计算结果做 0 下限裁剪，保留正常优惠与负数输入拒绝行为。"
+      },
+      "duration": 2.974
+    },
+    {
+      "stage": "tester",
+      "status": "passed",
+      "data": {
+        "test_source": "from pricing import payable\n\n\ndef test_discount_exceeding_subtotal_clamped_to_zero():\n    assert payable(10000, 15000) == 0\n",
+        "reason": "当前实现直接返回 subtotal - discount，10000-15000=-5000，未将实付金额下限钳制为 0；该测试断言业务要求的 0，会在当前实现上失败。"
+      },
+      "duration": 2.953
+    },
+    {
+      "stage": "reproduction",
+      "status": "passed",
+      "data": {
+        "returncode": 1,
+        "tests": 1,
+        "failed": 1,
+        "assertion_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "timed_out": false,
+        "duration": 0.751,
+        "log": "F                                                                        [100%]\n================================== FAILURES ===================================\n______________ test_discount_exceeding_subtotal_clamped_to_zero _______________\ntest_agent_regression.py:5: in test_discount_exceeding_subtotal_clamped_to_zero\n    assert payable(10000, 15000) == 0\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   AssertionError\n=========================== short test summary info ===========================\nFAILED test_agent_regression.py::test_discount_exceeding_subtotal_clamped_to_zero\n1 failed in 0.30s\n",
+        "passed": false
+      },
+      "duration": 0.76
+    },
+    {
+      "stage": "fixer:1",
+      "status": "passed",
+      "data": {
+        "edits": [
+          {
+            "path": "pricing.py",
+            "search": "    return subtotal_cents - discount_cents",
+            "replace": "    return max(0, subtotal_cents - discount_cents)"
+          }
+        ],
+        "summary": "将实付金额下限钳制为0，优惠超过订单金额时返回0；负数校验和正常优惠计算保持不变。"
+      },
+      "duration": 2.639
+    },
+    {
+      "stage": "patch:1",
+      "status": "passed",
+      "data": null,
+      "duration": 0.001
+    },
+    {
+      "stage": "verification:1",
+      "status": "passed",
+      "data": {
+        "returncode": 0,
+        "tests": 6,
+        "failed": 0,
+        "assertion_failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "timed_out": false,
+        "duration": 0.668,
+        "log": "......                                                                   [100%]\n6 passed in 0.23s\n",
+        "passed": true
+      },
+      "duration": 0.678
+    },
+    {
+      "stage": "reviewer:1",
+      "status": "passed",
+      "data": {
+        "approved": true,
+        "findings": [
+          "回归测试精确覆盖问题：payable(10000,15000) 期望 0，修复前断言失败、修复后通过，转变可解释。",
+          "修复用 max(0, ...) 实现下限 0，未硬编码示例金额，对任意超额优惠都通用。",
+          "负数校验仍保留在减法之前，subtotal<0 或 discount<0 仍抛 ValueError，已有行为未被破坏。",
+          "正常优惠与无优惠路径返回值不变；差异仅最小化、无副作用。",
+          "6 项测试全部通过（含原有 5 项），未见测试弱化或错误掩盖。"
+        ]
+      },
+      "duration": 2.824
+    }
+  ],
+  "attempts": [
+    {
+      "number": 1,
+      "summary": "将实付金额下限钳制为0，优惠超过订单金额时返回0；负数校验和正常优惠计算保持不变。",
+      "tests": {
+        "returncode": 0,
+        "tests": 6,
+        "failed": 0,
+        "assertion_failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "timed_out": false,
+        "duration": 0.668,
+        "log": "......                                                                   [100%]\n6 passed in 0.23s\n",
+        "passed": true
+      },
+      "review": {
+        "approved": true,
+        "findings": [
+          "回归测试精确覆盖问题：payable(10000,15000) 期望 0，修复前断言失败、修复后通过，转变可解释。",
+          "修复用 max(0, ...) 实现下限 0，未硬编码示例金额，对任意超额优惠都通用。",
+          "负数校验仍保留在减法之前，subtotal<0 或 discount<0 仍抛 ValueError，已有行为未被破坏。",
+          "正常优惠与无优惠路径返回值不变；差异仅最小化、无副作用。",
+          "6 项测试全部通过（含原有 5 项），未见测试弱化或错误掩盖。"
+        ]
+      }
+    }
+  ],
+  "baseline": {
+    "returncode": 0,
+    "tests": 5,
+    "failed": 0,
+    "assertion_failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "timed_out": false,
+    "duration": 0.726,
+    "log": ".....                                                                    [100%]\n5 passed in 0.23s\n",
+    "passed": true
+  },
+  "reproduction": {
+    "returncode": 1,
+    "tests": 1,
+    "failed": 1,
+    "assertion_failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "timed_out": false,
+    "duration": 0.751,
+    "log": "F                                                                        [100%]\n================================== FAILURES ===================================\n______________ test_discount_exceeding_subtotal_clamped_to_zero _______________\ntest_agent_regression.py:5: in test_discount_exceeding_subtotal_clamped_to_zero\n    assert payable(10000, 15000) == 0\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   AssertionError\n=========================== short test summary info ===========================\nFAILED test_agent_regression.py::test_discount_exceeding_subtotal_clamped_to_zero\n1 failed in 0.30s\n",
+    "passed": false
+  },
+  "error": null,
+  "diff": "--- a/pricing.py\n+++ b/pricing.py\n@@ -5,4 +5,4 @@\n     \"\"\"优惠后实付金额；业务约定金额不能为负数。\"\"\"\n     if subtotal_cents < 0 or discount_cents < 0:\n         raise ValueError(\"金额和优惠必须非负\")\n-    return subtotal_cents - discount_cents\n+    return max(0, subtotal_cents - discount_cents)\n--- /dev/null\n+++ b/test_agent_regression.py\n@@ -0,0 +1,5 @@\n+from pricing import payable\n+\n+\n+def test_discount_exceeding_subtotal_clamped_to_zero():\n+    assert payable(10000, 15000) == 0\n",
+  "max_attempts": 2,
+  "duration": 13.57,
+  "usage": {
+    "calls": 4,
+    "responses": 4,
+    "prompt_tokens": 2677,
+    "completion_tokens": 361,
+    "usage_reported_calls": 4
+  },
+  "evidence_note": "Historical live run through a third-party compatible service; model ID is platform-reported. Machine paths removed; timings, outputs and token counts preserved. Not a benchmark."
+}

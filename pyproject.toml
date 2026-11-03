@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bugfix-agent-portfolio"
+version = "0.1.0"
+description = "Evidence-driven multi-agent Python bug repair with DeepSeek"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [{name = "Hudson-21"}]
+requires-python = ">=3.11"
+dependencies = ["pytest>=8,<10"]
+
+[project.scripts]
+bugfix-agent = "bugfix_agent.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["bugfix_agent*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+bugfix_agent = ["cases/*/*.json", "cases/*/repo/*.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

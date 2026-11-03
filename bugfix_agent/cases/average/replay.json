@@ -1,0 +1,6 @@
+{
+  "locator": {"files": ["statistics_utils.py"], "reason": "mean 在求和后使用整除，导致平均值截断。"},
+  "tester": {"test_source": "from statistics_utils import mean\n\ndef test_fractional_mean():\n    assert mean([1, 2]) == 1.5\n\ndef test_negative_fractional_mean():\n    assert mean([-1, -2]) == -1.5\n", "reason": "覆盖正负非整数平均值。"},
+  "fixer": {"edits": [{"path": "statistics_utils.py", "search": "return sum(values) // len(values)", "replace": "return sum(values) / len(values)"}], "summary": "使用普通除法保留小数。"},
+  "reviewer": {"approved": true, "findings": ["预设审查意见：正负输入都得到正确算术平均值。", "预设审查意见：保留空列表校验，现有整值结果数值不变。"]}
+}
