@@ -1,5 +1,7 @@
 # BugFix Agent
 
+[![CI](https://github.com/Hudson-21/bugfix-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Hudson-21/bugfix-agent/actions/workflows/ci.yml)
+
 **面向可信小型 Python 仓库的多角色 Bug 修复助手：先复现，再修复，用测试和审查决定是否接受补丁。**
 
 默认接入 DeepSeek 官方 API，也支持兼容 Chat Completions 的服务。定位、测试、修复和审查使用同一模型的独立角色，由显式状态机编排；最多两轮修复，输出 HTML 报告、测试日志、代码差异与本地 PR 草稿。
@@ -9,6 +11,8 @@
 要求 **Python 3.11+**；运行项目自身的完整测试还需 Git。下载或克隆仓库后，在项目根目录运行，建议使用独立虚拟环境：
 
 ```sh
+git clone https://github.com/Hudson-21/bugfix-agent.git
+cd bugfix-agent
 python -m pip install -e .
 python -m bugfix_agent demo --case coupon --open
 ```
