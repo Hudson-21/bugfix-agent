@@ -26,8 +26,12 @@ jobs:
       - run: python -m pytest -q
       - run: python -m pip wheel --no-deps . --wheel-dir dist
       - run: python -m bugfix_agent demo --case coupon --output runs/ci-coupon
+      - run: python -m bugfix_agent demo --case inventory --output runs/ci-inventory
+      - run: python -m pytest -q evals/inventory --inventory-workspace runs/ci-inventory/workspace --junitxml=runs/ci-inventory/acceptance.xml
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: repair-report-${{ matrix.os }}-${{ matrix.python-version }}
-          path: runs/ci-coupon/
+          path: |
+            runs/ci-coupon/
+            runs/ci-inventory/

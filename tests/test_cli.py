@@ -10,7 +10,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 
 
-@pytest.mark.parametrize("case", ["coupon", "pagination", "average"])
+@pytest.mark.parametrize("case", ["coupon", "pagination", "average", "inventory"])
 def test_demo_generates_real_test_evidence_and_honest_report(tmp_path, case):
     output = tmp_path / case
     result = subprocess.run([sys.executable, "-m", "bugfix_agent", "demo", "--case", case,

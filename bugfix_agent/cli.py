@@ -32,7 +32,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="BugFix Agent — DeepSeek 多角色 Python Bug 修复助手")
     commands = parser.add_subparsers(dest="command", required=True)
     demo = commands.add_parser("demo", help="内置案例；默认预设响应演示，不调用模型")
-    demo.add_argument("--case", choices=["coupon", "pagination", "average"], default="coupon")
+    demo.add_argument("--case", choices=["coupon", "pagination", "average", "inventory"], default="coupon")
     demo.add_argument("--live", action="store_true", help="对此内置案例调用配置的模型 API")
     custom = commands.add_parser("run", help="调用 DeepSeek 修复可信的小型 Python 仓库")
     custom.add_argument("--repo", type=Path, required=True)

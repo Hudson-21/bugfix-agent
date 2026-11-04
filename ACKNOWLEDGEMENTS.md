@@ -17,4 +17,4 @@ This project was developed with AI assistance. Its tests, examples, and observed
 - [SWE-agent](https://github.com/SWE-agent/SWE-agent) — autonomous tool use for software repair; MIT license. Its README recommends mini-swe-agent for new work.
 - [SWE-bench](https://github.com/SWE-bench/SWE-bench) — reproducible evaluation of patches against software issues; MIT license.
 
-These projects informed the research discussion. This repository does not vendor their code, run their benchmark, or claim comparable performance. The three bundled examples are small, purpose-written fixtures.
+These projects informed the research discussion. This repository does not vendor their code, run their benchmark, or claim comparable performance. The four bundled examples are small, purpose-written fixtures created with AI assistance. The inventory case adds a separate acceptance suite outside the model's input repository to check failed-order state preservation and cumulative demand. This is a project-specific engineering check, not a hidden benchmark or an independent model evaluation.

@@ -97,14 +97,24 @@ export DEEPSEEK_MODEL=deepseek-chat
 | `coupon` | 超额优惠使实付金额为负 |
 | `pagination` | 整除导致遗漏不足一整页的尾页 |
 | `average` | 整除导致平均值丢失小数 |
+| `inventory` | 订单后续行失败时，之前的库存扣减没有恢复 |
 
 ```sh
 python -m bugfix_agent demo --case pagination --open
 python -m bugfix_agent demo --case average --live --ask-key --open
+python -m bugfix_agent demo --case inventory --open
 python -m bugfix_agent run --repo ./my-python-demo --issue "calculate(100, 150) 当前返回 -50，应返回 0，保留正常计算和参数校验" --ask-key --open
 ```
 
 默认输出至当前目录 `runs/`。若当前目录位于输入仓库内，则输出到该仓库旁的 `bugfix-agent-runs/`。`--output` 可指定尚不存在的新目录，不能与输入仓库互相包含。`--max-attempts` 支持 1 或 2。
+
+### 新案例：库存整单预留
+
+`inventory` 展示多步骤状态修改：订单先扣茶叶，随后发现咖啡不足，抛出异常后茶叶库存却已减少。要求任何一行失败时库存完整不变，重复商品按总需求检查，成功才原地扣减。
+
+案例原有 9 项测试通过；replay 新增 3 项测试先在原代码上断言失败，修复后共 12 项通过。另有不发送给模型的 12 项独立验收，检查未知商品、非法数量、重复商品、失败后再次下单和输入保护；单独运行，不计入修复报告的测试总数。
+
+当前只完成 replay 和独立验收，**尚无 inventory live 证据**。它是 AI 辅助设计的合成案例，不是隐藏基准。完整业务约定、运行与验收命令见[库存案例说明](docs/cases/inventory.md)。
 
 ## 工作流程
 

@@ -1,0 +1,30 @@
+{
+  "locator": {
+    "files": [
+      "inventory.py"
+    ],
+    "reason": "reserve 逐行检查并立即扣减，后续行失败会遗留前面的修改。"
+  },
+  "tester": {
+    "test_source": "import pytest\n\nfrom inventory import reserve\n\n\ndef test_late_shortage_keeps_entire_stock():\n    stock = {\"tea\": 5, \"coffee\": 1}\n    with pytest.raises(ValueError):\n        reserve(stock, [(\"tea\", 2), (\"coffee\", 2)])\n    assert stock == {\"tea\": 5, \"coffee\": 1}\n\n\ndef test_repeated_product_shortage_keeps_stock():\n    stock = {\"tea\": 5}\n    with pytest.raises(ValueError):\n        reserve(stock, [(\"tea\", 3), (\"tea\", 3)])\n    assert stock == {\"tea\": 5}\n\n\ndef test_late_invalid_quantity_keeps_stock():\n    stock = {\"tea\": 5, \"coffee\": 1}\n    with pytest.raises(ValueError):\n        reserve(stock, [(\"tea\", 2), (\"coffee\", 0)])\n    assert stock == {\"tea\": 5, \"coffee\": 1}\n",
+    "reason": "在后续库存不足、重复商品总量不足、后续非法数量时，异常后库存必须完整保留。"
+  },
+  "fixer": {
+    "edits": [
+      {
+        "path": "inventory.py",
+        "search": "    for sku, quantity in lines:\n        if isinstance(quantity, bool) or not isinstance(quantity, int) or quantity <= 0:\n            raise ValueError(\"数量必须为正整数\")\n        if sku not in stock or stock[sku] < quantity:\n            raise ValueError(\"商品不存在或库存不足\")\n        stock[sku] -= quantity\n",
+        "replace": "    required = {}\n    for sku, quantity in lines:\n        if isinstance(quantity, bool) or not isinstance(quantity, int) or quantity <= 0:\n            raise ValueError(\"数量必须为正整数\")\n        required[sku] = required.get(sku, 0) + quantity\n    for sku, quantity in required.items():\n        if sku not in stock or stock[sku] < quantity:\n            raise ValueError(\"商品不存在或库存不足\")\n    for sku, quantity in required.items():\n        stock[sku] -= quantity\n"
+      }
+    ],
+    "summary": "先累计各商品需求并完成校验，所有检查通过后统一扣减。"
+  },
+  "reviewer": {
+    "approved": true,
+    "findings": [
+      "预设审查意见：所有失败条件都在修改库存之前检查。",
+      "预设审查意见：重复商品按累计数量检查，成功原地扣减，不修改订单列表。",
+      "预设审查意见：保留空订单、无关商品、零库存键及参数校验。独立验收需在流程外另行运行。"
+    ]
+  }
+}
