@@ -1,0 +1,181 @@
+{
+  "id": "20261104-092157-90a890",
+  "issue": "statistics_utils.mean([1, 2]) 返回 1，正确的算术平均值应为 1.5；负数输入 [-1, -2] 应返回 -1.5。保留空列表抛出 ValueError 的行为。",
+  "source": "bugfix_agent/cases/average/repo",
+  "output": "docs/evidence/average-live",
+  "mode": "live",
+  "model": "deepseek-v4.1-flash",
+  "status": "success",
+  "started_at": "2026-11-04T01:21:57.370798+00:00",
+  "events": [
+    {
+      "stage": "baseline",
+      "status": "passed",
+      "data": {
+        "returncode": 0,
+        "tests": 3,
+        "failed": 0,
+        "assertion_failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "timed_out": false,
+        "duration": 0.748,
+        "log": "...                                                                      [100%]\n3 passed in 0.25s\n",
+        "passed": true
+      },
+      "duration": 0.756
+    },
+    {
+      "stage": "locator",
+      "status": "passed",
+      "data": {
+        "files": [
+          "statistics_utils.py"
+        ],
+        "reason": "mean 的实现位于 statistics_utils.py，需修正为用总和除以长度得到 1.5 / -1.5，并保留空列表抛 ValueError。"
+      },
+      "duration": 2.802
+    },
+    {
+      "stage": "tester",
+      "status": "passed",
+      "data": {
+        "test_source": "import pytest\n\nfrom statistics_utils import mean\n\n\ndef test_mean_fractional():\n    assert mean([1, 2]) == 1.5\n\n\ndef test_mean_negative():\n    assert mean([-1, -2]) == -1.5\n\n\ndef test_mean_empty_rejected():\n    with pytest.raises(ValueError):\n        mean([])\n",
+        "reason": "当前实现用整除 //，对 [1, 2] 返回 1 而非 1.5，对 [-1, -2] 返回 -1 而非 -1.5，断言会失败；空列表仍断言抛出 ValueError 以验证保留行为。"
+      },
+      "duration": 3.458
+    },
+    {
+      "stage": "reproduction",
+      "status": "passed",
+      "data": {
+        "returncode": 1,
+        "tests": 3,
+        "failed": 2,
+        "assertion_failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "timed_out": false,
+        "duration": 0.718,
+        "log": "FF.                                                                      [100%]\n================================== FAILURES ===================================\n____________________________ test_mean_fractional _____________________________\ntest_agent_regression.py:7: in test_mean_fractional\n    assert mean([1, 2]) == 1.5\n           ^^^^^^^^^^^^^^^^^^^\nE   AssertionError\n_____________________________ test_mean_negative ______________________________\ntest_agent_regression.py:11: in test_mean_negative\n    assert mean([-1, -2]) == -1.5\n           ^^^^^^^^^^^^^^^^^^^^^^\nE   AssertionError\n=========================== short test summary info ===========================\nFAILED test_agent_regression.py::test_mean_fractional - AssertionError\nFAILED test_agent_regression.py::test_mean_negative - AssertionError\n2 failed, 1 passed in 0.27s\n",
+        "passed": false
+      },
+      "duration": 0.726
+    },
+    {
+      "stage": "fixer:1",
+      "status": "passed",
+      "data": {
+        "edits": [
+          {
+            "path": "statistics_utils.py",
+            "search": "    return sum(values) // len(values)",
+            "replace": "    return sum(values) / len(values)"
+          }
+        ],
+        "summary": "用真除法 `/` 代替整数地板除 `//`，使 [1,2] 得 1.5、[-1,-2] 得 -1.5；空列表检查保持不变。"
+      },
+      "duration": 2.862
+    },
+    {
+      "stage": "patch:1",
+      "status": "passed",
+      "data": null,
+      "duration": 0.001
+    },
+    {
+      "stage": "verification:1",
+      "status": "passed",
+      "data": {
+        "returncode": 0,
+        "tests": 6,
+        "failed": 0,
+        "assertion_failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "timed_out": false,
+        "duration": 0.696,
+        "log": "......                                                                   [100%]\n6 passed in 0.22s\n",
+        "passed": true
+      },
+      "duration": 0.705
+    },
+    {
+      "stage": "reviewer:1",
+      "status": "passed",
+      "data": {
+        "approved": true,
+        "findings": [
+          "修复将向下取整除法 // 改为真除法 /，直接解决了 [1,2] 与 [-1,-2] 返回截断结果的问题。",
+          "回归测试在修复前对 [1,2]、[-1,-2] 断言失败（reproduction 显示 2 failed），修复后 6 项全通过，失败到成功过渡清晰。",
+          "空列表抛 ValueError 的分支保持不变，回归测试仍覆盖该行为。",
+          "仅改动一行运算符号，无硬编码、无错误掩盖、未削弱既有测试，也无无关副作用。"
+        ]
+      },
+      "duration": 3.795
+    }
+  ],
+  "attempts": [
+    {
+      "number": 1,
+      "summary": "用真除法 `/` 代替整数地板除 `//`，使 [1,2] 得 1.5、[-1,-2] 得 -1.5；空列表检查保持不变。",
+      "tests": {
+        "returncode": 0,
+        "tests": 6,
+        "failed": 0,
+        "assertion_failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "timed_out": false,
+        "duration": 0.696,
+        "log": "......                                                                   [100%]\n6 passed in 0.22s\n",
+        "passed": true
+      },
+      "review": {
+        "approved": true,
+        "findings": [
+          "修复将向下取整除法 // 改为真除法 /，直接解决了 [1,2] 与 [-1,-2] 返回截断结果的问题。",
+          "回归测试在修复前对 [1,2]、[-1,-2] 断言失败（reproduction 显示 2 failed），修复后 6 项全通过，失败到成功过渡清晰。",
+          "空列表抛 ValueError 的分支保持不变，回归测试仍覆盖该行为。",
+          "仅改动一行运算符号，无硬编码、无错误掩盖、未削弱既有测试，也无无关副作用。"
+        ]
+      }
+    }
+  ],
+  "baseline": {
+    "returncode": 0,
+    "tests": 3,
+    "failed": 0,
+    "assertion_failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "timed_out": false,
+    "duration": 0.748,
+    "log": "...                                                                      [100%]\n3 passed in 0.25s\n",
+    "passed": true
+  },
+  "reproduction": {
+    "returncode": 1,
+    "tests": 3,
+    "failed": 2,
+    "assertion_failures": 2,
+    "errors": 0,
+    "skipped": 0,
+    "timed_out": false,
+    "duration": 0.718,
+    "log": "FF.                                                                      [100%]\n================================== FAILURES ===================================\n____________________________ test_mean_fractional _____________________________\ntest_agent_regression.py:7: in test_mean_fractional\n    assert mean([1, 2]) == 1.5\n           ^^^^^^^^^^^^^^^^^^^\nE   AssertionError\n_____________________________ test_mean_negative ______________________________\ntest_agent_regression.py:11: in test_mean_negative\n    assert mean([-1, -2]) == -1.5\n           ^^^^^^^^^^^^^^^^^^^^^^\nE   AssertionError\n=========================== short test summary info ===========================\nFAILED test_agent_regression.py::test_mean_fractional - AssertionError\nFAILED test_agent_regression.py::test_mean_negative - AssertionError\n2 failed, 1 passed in 0.27s\n",
+    "passed": false
+  },
+  "error": null,
+  "diff": "--- a/statistics_utils.py\n+++ b/statistics_utils.py\n@@ -2,4 +2,4 @@\n     \"\"\"计算非空整数列表的算术平均值。\"\"\"\n     if not values:\n         raise ValueError(\"列表不能为空\")\n-    return sum(values) // len(values)\n+    return sum(values) / len(values)\n--- /dev/null\n+++ b/test_agent_regression.py\n@@ -0,0 +1,16 @@\n+import pytest\n+\n+from statistics_utils import mean\n+\n+\n+def test_mean_fractional():\n+    assert mean([1, 2]) == 1.5\n+\n+\n+def test_mean_negative():\n+    assert mean([-1, -2]) == -1.5\n+\n+\n+def test_mean_empty_rejected():\n+    with pytest.raises(ValueError):\n+        mean([])\n",
+  "max_attempts": 2,
+  "duration": 15.11,
+  "usage": {
+    "calls": 4,
+    "responses": 4,
+    "prompt_tokens": 2492,
+    "completion_tokens": 435,
+    "usage_reported_calls": 4
+  },
+  "evidence_note": "Historical live run through a third-party compatible service; model ID is platform-reported. Machine paths removed; timings, outputs and token counts preserved. Not a benchmark."
+}

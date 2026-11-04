@@ -21,7 +21,7 @@ python -m bugfix_agent demo --case coupon --open
 
 ## 真实运行证据
 
-已通过兼容接口完成 coupon 和 pagination 两个案例的 live 运行。coupon 首次结果：
+已通过兼容接口完成 coupon、pagination 和 average 三个案例的 live 运行。coupon 首次结果：
 
 | 项目 | 观察结果 |
 |---|---|
@@ -37,7 +37,9 @@ python -m bugfix_agent demo --case coupon --open
 
 分页案例也在第一轮修复成功：原有 3 项测试通过，模型新增 5 项测试，其中 2 项在原代码上断言失败，修复后共 8 项通过；4 次 API 请求，耗时 39.818 秒。查看 [分页完整证据](docs/evidence/pagination-live/report.json) 和 [补丁](docs/evidence/pagination-live/patch.diff)。
 
-历史报告已移除本机绝对路径，其余运行数据保留。**这是两个简单案例的联调，不能解释为整体成功率。** 默认配置使用官方接口；官方接口尚未实测，实际历史测试来源在运行记录中说明。
+平均值案例在第一轮将 `//` 改为 `/`：基线 3 项通过，新增 3 项测试在原代码上 2 项断言失败、1 项通过，修复后共 6 项通过；4 次 API 请求，耗时 15.11 秒。查看 [平均值完整证据](docs/evidence/average-live/report.json) 和 [补丁](docs/evidence/average-live/patch.diff)。原始模型回复中对负数整除结果的一处误述已在[运行记录](docs/真实模型运行记录.md#平均值案例)中注明，没有改写历史回复。
+
+历史报告已移除本机绝对路径，其余运行数据保留。**这是三个简单案例的联调，不能解释为整体成功率。** 默认配置使用官方接口；官方接口尚未实测，实际历史测试来源在运行记录中说明。
 
 演示时可按[两分钟演示指南](docs/演示指南.md)展示问题、复现失败、修复后通过与补丁；指南区分历史 live 证据和现场预设演示，视频尚未录制。
 

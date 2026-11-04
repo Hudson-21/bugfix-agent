@@ -1,0 +1,27 @@
+--- a/statistics_utils.py
++++ b/statistics_utils.py
+@@ -2,4 +2,4 @@
+     """计算非空整数列表的算术平均值。"""
+     if not values:
+         raise ValueError("列表不能为空")
+-    return sum(values) // len(values)
++    return sum(values) / len(values)
+--- /dev/null
++++ b/test_agent_regression.py
+@@ -0,0 +1,16 @@
++import pytest
++
++from statistics_utils import mean
++
++
++def test_mean_fractional():
++    assert mean([1, 2]) == 1.5
++
++
++def test_mean_negative():
++    assert mean([-1, -2]) == -1.5
++
++
++def test_mean_empty_rejected():
++    with pytest.raises(ValueError):
++        mean([])
