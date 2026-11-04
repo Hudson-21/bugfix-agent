@@ -39,6 +39,8 @@ python -m bugfix_agent demo --case coupon --open
 
 历史报告已移除本机绝对路径，其余运行数据保留。**这是两个简单案例的联调，不能解释为整体成功率。** 默认配置使用官方接口；官方接口尚未实测，实际历史测试来源在运行记录中说明。
 
+演示时可按[两分钟演示指南](docs/演示指南.md)展示问题、复现失败、修复后通过与补丁；指南区分历史 live 证据和现场预设演示，视频尚未录制。
+
 ## 接入 DeepSeek 官方 API
 
 在 [DeepSeek 开放平台](https://platform.deepseek.com/) 获取 API Key。程序默认 Base URL 为 `https://api.deepseek.com`、模型为 `deepseek-chat`。模型名称应与官方账户当前可用的 model ID 一致。
